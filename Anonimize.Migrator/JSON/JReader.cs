@@ -5,44 +5,41 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.IO;
+using Newtonsoft.Json;
 
-namespace Anonimize.Migrator.XML
+namespace Anonimize.Migrator.JSON
 {
-    public class XReader : IDisposable
+    public class JReader<T> : IDisposable where T : class
     {
-        XDocument document;
+        T document;
         string uri;
 
-        public XDocument Document { get => document; }
+        public T Document { get => document; }
         public string Uri { get => uri; }
 
-        public XReader(string uri)
+        public JReader(string uri)
         {
             this.uri = uri;
         }
 
         /// <summary>
-        /// Reads the XML document.
+        /// Reads the JSON document.
         /// </summary>
         /// <exception cref="FileNotFoundException"></exception>
         /// <exception cref="FileLoadException"></exception>
-        public virtual void ReadXmlDocument()
+        public virtual void ReadJsonDocument()
         {
-            if(!File.Exists(uri))
+            if (!File.Exists(uri))
                 throw new FileNotFoundException($"File '{uri}' not found.");
 
-            document = XDocument.Load(uri);
+            using (StreamReader file = File.OpenText(uri))
+            {
+                var serializer = new JsonSerializer();
+                document = (T)serializer.Deserialize(file, typeof(T));
+            }
 
             if (document == null)
                 throw new FileLoadException($"Document '{uri}' couldn't be loaded.");
-        }
-
-        /// <summary>
-        /// Saves the XML document.
-        /// </summary>
-        public virtual void SaveXmlDocument()
-        {
-            document.Save(uri);
         }
 
         public void Dispose()

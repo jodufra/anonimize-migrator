@@ -30,11 +30,13 @@ namespace Anonimize.Migrator.XML
 
         public static string GetConnectionString(XDocument document, string connectionName)
         {
-            var query = from c in document.Root.Descendants("connectionStrings").Descendants()
-                        where (string)c.Attribute("name") == connectionName
-                        select c.Element("connectionString").Value;
+            var query = document.Root.Descendants();
+            query = query.Where(q => q.Name == "connectionStrings").SelectMany(q => q.Descendants());
+            query = query.Where(q => (string)q.Attribute("name") == connectionName);
 
-            return query.FirstOrDefault();
+            var connectionStrings = query.Select(q => (string)q.Attribute("connectionString"));
+
+            return connectionStrings.FirstOrDefault();
         }
 
     }
