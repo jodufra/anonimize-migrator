@@ -2,6 +2,7 @@
   "Tables": [
     {
       "Name": "User",
+      "PrimaryKey": "IdUser",
       "Columns": [
         {
           "Name": "AddressDistrict",

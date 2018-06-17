@@ -1,30 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using NLog;
 
 namespace Anonimize.Migrator.XML
 {
-    public class XEntities : XReader
+    public class XEntities : XContext
     {
-        static Logger logger = LogManager.GetCurrentClassLogger();
+        static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        const string URI = @"..\Entities\Generated\EntitiesModel.rlinq";
+        readonly XNamespace XMLNS = ConfigurationManager.AppSettings["Entities:Xmlns"];
 
-        public XEntities() : base(URI)
+        public XEntities() : base(ConfigurationManager.AppSettings["Uri:Entities"])
         {
         }
 
         public bool SetConverter(string className, string propertyName, string converter)
         {
-            XNamespace xmlns = "http://www.telerik.com/orm";
-
-            var orm = Document.Root.Descendants(xmlns + "orm");
-            var ormNamespace = orm.Descendants(xmlns + "namespace");
-            var ormClass = ormNamespace.Descendants(xmlns + "class").Where(q => (string)q.Attribute("name") == className).FirstOrDefault();
+            var orm = Document.Descendants(XMLNS + "orm");
+            var ormNamespace = orm.Descendants(XMLNS + "namespace");
+            var ormClass = ormNamespace.Descendants(XMLNS + "class").FirstOrDefault(q => (string)q.Attribute("name") == className);
 
             if (ormClass == null)
             {
@@ -32,19 +27,19 @@ namespace Anonimize.Migrator.XML
                 return false;
             }
 
-            var tableName = ormClass.Descendants(xmlns + "table").Select(q => (string)q.Attribute("name")).First();
-            var ormField = ormClass.Descendants(xmlns + "field").Where(q => (string)q.Attribute("property") == propertyName).FirstOrDefault();
+            var tableName = ormClass.Descendants(XMLNS + "table").Select(q => (string)q.Attribute("name")).First();
+            var ormField = ormClass.Descendants(XMLNS + "field").FirstOrDefault(q => (string)q.Attribute("property") == propertyName);
 
             if (ormField == null)
             {
                 logger.Debug("<orm:field property=\"{1}\"> of class {0} not found", className, propertyName);
                 return false;
             }
-            
+
             ApplyConverter(ormField.Descendants().First(), converter);
 
-            var ormSchema = orm.Descendants(xmlns + "schema");
-            var ormTable = ormSchema.Descendants(xmlns + "table").Where(q => (string)q.Attribute("name") == tableName).FirstOrDefault();
+            var ormSchema = orm.Descendants(XMLNS + "schema");
+            var ormTable = ormSchema.Descendants(XMLNS + "table").FirstOrDefault(q => (string)q.Attribute("name") == tableName);
 
             if (ormTable == null)
             {
@@ -52,7 +47,7 @@ namespace Anonimize.Migrator.XML
                 return false;
             }
 
-            var ormTableColumn = ormTable.Descendants(xmlns + "column").Where(q => (string)q.Attribute("name") == propertyName).First();
+            var ormTableColumn = ormTable.Descendants(XMLNS + "column").First(q => (string)q.Attribute("name") == propertyName);
 
             ApplyConverter(ormTableColumn, converter);
 
@@ -67,13 +62,28 @@ namespace Anonimize.Migrator.XML
             if (applyConverter)
             {
                 if (attribute == null)
+                {
+                    logger.Debug("Added converter '{0}'", converter);
                     element.Add(new XAttribute("converter", converter));
-                else
+                }
+                else if (attribute.Value != converter)
+                {
+                    logger.Debug("Updated converter from '{0}' to '{1}'", attribute.Value, converter);
                     attribute.Value = converter;
+                }
+                else
+                {
+                    logger.Debug("Previously included converter");
+                }
             }
             else if (attribute != null)
             {
+                logger.Debug("Removed converter '{0}'", attribute.Value);
                 attribute.Remove();
+            }
+            else
+            {
+                logger.Debug("Previously removed converter");
             }
         }
 

@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -11,15 +6,12 @@ namespace Anonimize.Migrator.JSON
 {
     public class JReader<T> : IDisposable where T : class
     {
-        T document;
-        string uri;
-
-        public T Document { get => document; }
-        public string Uri { get => uri; }
+        public T Document { get; private set; }
+        public string Uri { get; private set; }
 
         public JReader(string uri)
         {
-            this.uri = uri;
+            Uri = uri;
         }
 
         /// <summary>
@@ -29,17 +21,17 @@ namespace Anonimize.Migrator.JSON
         /// <exception cref="FileLoadException"></exception>
         public virtual void ReadJsonDocument()
         {
-            if (!File.Exists(uri))
-                throw new FileNotFoundException($"File '{uri}' not found.");
+            if (!File.Exists(Uri))
+                throw new FileNotFoundException($"File '{Uri}' not found.");
 
-            using (StreamReader file = File.OpenText(uri))
+            using (StreamReader file = File.OpenText(Uri))
             {
                 var serializer = new JsonSerializer();
-                document = (T)serializer.Deserialize(file, typeof(T));
+                Document = (T)serializer.Deserialize(file, typeof(T));
             }
 
-            if (document == null)
-                throw new FileLoadException($"Document '{uri}' couldn't be loaded.");
+            if (Document == null)
+                throw new FileLoadException($"Document '{Uri}' couldn't be loaded.");
         }
 
         public void Dispose()
@@ -52,7 +44,7 @@ namespace Anonimize.Migrator.JSON
         {
             if (disposing)
             {
-                document = null;
+                Document = null;
             }
         }
     }

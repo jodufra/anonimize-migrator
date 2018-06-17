@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Anonimize.Migrator.JSON;
 using Anonimize.Migrator.Models;
 using NLog;
@@ -11,9 +7,11 @@ namespace Anonimize.Migrator.Services
 {
     public abstract class AUpdateService
     {
+        static readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         protected IList<Table> tables;
 
-        protected AUpdateService(JConfig jConfig) : this(jConfig.Document.Tables) { }
+        protected AUpdateService(JConfig jConfig) : this(jConfig.Tables) { }
 
         protected AUpdateService(IList<Table> tables)
         {
@@ -22,24 +20,29 @@ namespace Anonimize.Migrator.Services
 
         public virtual bool Update()
         {
-            var migrated = true;
+            var updated = true;
             foreach (var table in tables)
             {
-                migrated &= UpdateTable(table);
+                logger.Debug("Updating table '{0}'", table.Name);
+                updated &= UpdateTable(table);
             }
-            return migrated;
+            return updated;
         }
 
-        public virtual bool UpdateTable(Table table)
+        protected virtual bool UpdateTable(Table table)
         {
-            var migrated = true;
+            var updated = true;
             foreach (var column in table.Columns)
             {
-                migrated &= UpdateTableColumn(table, column);
+                logger.Debug("Updating column '{0}'", column.Name);
+                updated &= UpdateTableColumn(table, column);
             }
-            return migrated;
+            return updated;
         }
 
-        public abstract bool UpdateTableColumn(Table table, TableColumn tableColumn);
+        protected virtual bool UpdateTableColumn(Table table, TableColumn column)
+        {
+            return false;
+        }
     }
 }

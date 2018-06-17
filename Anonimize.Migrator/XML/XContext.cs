@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.IO;
 
 namespace Anonimize.Migrator.XML
 {
-    public class XReader : IDisposable
+    public class XContext : IDisposable
     {
-        XDocument document;
-        string uri;
+        public XDocument Document { get; private set; }
+        public string Uri { get; private set; }
 
-        public XDocument Document { get => document; }
-        public string Uri { get => uri; }
-
-        public XReader(string uri)
+        public XContext(string uri)
         {
-            this.uri = uri;
+            Uri = uri;
         }
 
         /// <summary>
@@ -28,13 +21,13 @@ namespace Anonimize.Migrator.XML
         /// <exception cref="FileLoadException"></exception>
         public virtual void ReadXmlDocument()
         {
-            if(!File.Exists(uri))
-                throw new FileNotFoundException($"File '{uri}' not found.");
+            if(!File.Exists(Uri))
+                throw new FileNotFoundException($"File '{Uri}' not found.");
 
-            document = XDocument.Load(uri);
+            Document = XDocument.Load(Uri);
 
-            if (document == null)
-                throw new FileLoadException($"Document '{uri}' couldn't be loaded.");
+            if (Document == null)
+                throw new FileLoadException($"Document '{Uri}' couldn't be loaded.");
         }
 
         /// <summary>
@@ -42,7 +35,7 @@ namespace Anonimize.Migrator.XML
         /// </summary>
         public virtual void SaveXmlDocument()
         {
-            document.Save(uri);
+            Document.Save(Uri);
         }
 
         public void Dispose()
@@ -55,7 +48,7 @@ namespace Anonimize.Migrator.XML
         {
             if (disposing)
             {
-                document = null;
+                Document = null;
             }
         }
     }

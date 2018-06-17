@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Anonimize.Migrator.XML;
+﻿using Anonimize.Migrator.XML;
 using Anonimize.Migrator.JSON;
 using Anonimize.Migrator.Models;
 
@@ -22,12 +17,15 @@ namespace Anonimize.Migrator.Services
         {
             var updated = base.Update();
 
-            xEntities.SaveXmlDocument();
+            if (updated)
+            {
+                xEntities.SaveXmlDocument();
+            }
 
             return updated;
         }
 
-        public override bool UpdateTableColumn(Table table, TableColumn column)
+        protected override bool UpdateTableColumn(Table table, TableColumn column)
         {
             return xEntities.SetConverter(table.Name, column.Name, column.Converter);
         }

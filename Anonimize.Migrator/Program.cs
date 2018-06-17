@@ -5,18 +5,19 @@ using System;
 using NLog;
 using System.Runtime.InteropServices;
 using Anonimize.Migrator.Services;
+using System.Globalization;
 
 namespace Anonimize.Migrator
 {
     class Program
     {
-        static Logger logger = LogManager.GetCurrentClassLogger();
+        static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         static JConfig jConfig;
         static XAppConfig xAppConfig;
         static XEntities xEntities;
 
-        static void Main(string[] args)
+        static void Main()
         {
             logger.Info("|-----------------------------------------|");
             logger.Info("|-------------- Anonimizer ---------------|");
@@ -24,19 +25,45 @@ namespace Anonimize.Migrator
 
             SetConsoleCtrlHandler(new ConsoleCtrlHandler(OnConsoleEvent), true);
 
+            CultureInfo.CurrentCulture = new CultureInfo("pt-PT");
+            CultureInfo.CurrentUICulture = new CultureInfo("pt-PT");
+
             logger.Info("Start: {0}", DateTime.Now.ToString());
 
             if (!LoadResources())
                 DisposeAndExit();
 
-            logger.Info("Connection String: {0}", xAppConfig.ConnectionString);
+            // Update converters
+            logger.Info("Updating converters");
 
-            if (!CanProceed())            
+            if (!CanProceed())
                 DisposeAndExit();
 
-            logger.Info("Updating converters");
             var converterService = new ConverterUpdateService(jConfig, xEntities);
-            if (!converterService.Update())
+            if (converterService.Update())
+            {
+                logger.Info("Updated with success");
+            }
+            else
+            {
+                logger.Fatal("One or more errors occurred while updating");
+                logger.Warn("Check log file for debug info");
+                DisposeAndExit();
+            }
+            
+            // Update database
+            logger.Info("Updating database");
+            logger.Warn("Connection: {0}", xAppConfig.ConnectionString);
+
+            if (!CanProceed())
+                DisposeAndExit();
+
+            var databaseService = new DatabaseUpdateService(jConfig, xAppConfig);
+            if (databaseService.Update())
+            {
+                logger.Info("Updated with success");
+            }
+            else
             {
                 logger.Fatal("One or more errors occurred while updating");
                 logger.Warn("Check log file for debug info");
@@ -59,9 +86,10 @@ namespace Anonimize.Migrator
                 xEntities = new XEntities();
                 xEntities.ReadXmlDocument();
             }
-            catch (FileNotFoundException ex)
+            catch (Exception ex)
             {
-                logger.Fatal(ex);
+                logger.Fatal(ex.Message);
+                logger.Debug(ex);
                 return false;
             }
 
@@ -76,6 +104,8 @@ namespace Anonimize.Migrator
 
             if (exitCode.HasValue)
                 logger.Warn($"Application terminated ({0}).", exitCode.Value);
+            else
+                logger.Debug($"Application terminated.");
 
             LogManager.Flush();
 
@@ -120,7 +150,7 @@ namespace Anonimize.Migrator
             return proceed.Value;
         }
 
-
+        #region ConsoleCtrlHandler
         delegate bool ConsoleCtrlHandler(int eventType);
 
         [DllImport("Kernel32")]
@@ -131,5 +161,6 @@ namespace Anonimize.Migrator
             DisposeAndExit(eventType);
             return false;
         }
+        #endregion
     }
 }

@@ -1,20 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace Anonimize.Migrator.XML
 {
-    public class XAppConfig : XReader
+    public class XAppConfig : XContext
     {
-        const string CONNECTION_NAME = "Connection";
-        const string URI = @"..\App.config";
+        readonly string CONNECTION_NAME = ConfigurationManager.AppSettings["AppConfig:Connection"];
+        readonly string CONNECTION_STRING_POSFIX = ConfigurationManager.AppSettings["AppConfig:ConnectionStringPosfix"];
 
         string connectionString;
 
-        public XAppConfig() : base(URI)
+        public XAppConfig() : base(ConfigurationManager.AppSettings["Uri:AppConfig"])
         {
         }
 
@@ -23,7 +21,12 @@ namespace Anonimize.Migrator.XML
             get
             {
                 if (connectionString == null)
+                {
                     connectionString = GetConnectionString(Document, CONNECTION_NAME);
+                    if (!connectionString.EndsWith(";", StringComparison.Ordinal))
+                        connectionString += ";";
+                    connectionString += CONNECTION_STRING_POSFIX;
+                }
                 return connectionString;
             }
         }

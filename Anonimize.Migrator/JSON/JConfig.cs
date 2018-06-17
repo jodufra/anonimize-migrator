@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Configuration;
 using Anonimize.Migrator.Models;
 using Newtonsoft.Json;
 
@@ -11,9 +7,9 @@ namespace Anonimize.Migrator.JSON
 {
     public class JConfig : JReader<JConfig.Config>
     {
-        const string URI = "config.json";
+        public IList<Table> Tables => Document?.Tables;
 
-        public JConfig() : base(URI)
+        public JConfig() : base(ConfigurationManager.AppSettings["Uri:Config"])
         {
         }
 
