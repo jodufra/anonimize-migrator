@@ -96,7 +96,7 @@ namespace Anonimize.Migrator
             return true;
         }
 
-        static void DisposeAndExit(int? exitCode = null)
+        static void DisposeAndExit(int? exitCode = null, bool pressKey = true)
         {
             NullSafeDispose(jConfig);
             NullSafeDispose(xAppConfig);
@@ -108,6 +108,12 @@ namespace Anonimize.Migrator
                 logger.Debug($"Application terminated.");
 
             LogManager.Flush();
+
+            if (pressKey)
+            {
+                Console.WriteLine("Press any key to exit.");
+                Console.ReadKey();
+            }
 
             Environment.Exit(exitCode ?? 0);
         }
@@ -158,7 +164,7 @@ namespace Anonimize.Migrator
 
         static bool OnConsoleEvent(int eventType)
         {
-            DisposeAndExit(eventType);
+            DisposeAndExit(eventType, false);
             return false;
         }
         #endregion
