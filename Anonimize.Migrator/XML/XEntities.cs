@@ -36,7 +36,7 @@ namespace Anonimize.Migrator.XML
                 return false;
             }
 
-            ApplyConverter(ormField.Descendants().First(), converter);
+            SetElementConverter(ormField.Descendants().First(), converter);
 
             var ormSchema = orm.Descendants(XMLNS + "schema");
             var ormTable = ormSchema.Descendants(XMLNS + "table").FirstOrDefault(q => (string)q.Attribute("name") == tableName);
@@ -49,12 +49,14 @@ namespace Anonimize.Migrator.XML
 
             var ormTableColumn = ormTable.Descendants(XMLNS + "column").First(q => (string)q.Attribute("name") == propertyName);
 
-            ApplyConverter(ormTableColumn, converter);
+            SetElementConverter(ormTableColumn, converter);
+            SetElementSqlType(ormTableColumn);
+            SetElementLength(ormTableColumn);
 
             return true;
         }
 
-        static void ApplyConverter(XElement element, string converter)
+        static void SetElementConverter(XElement element, string converter)
         {
             var applyConverter = !string.IsNullOrWhiteSpace(converter);
             var attribute = element.Attribute("converter");
@@ -87,5 +89,31 @@ namespace Anonimize.Migrator.XML
             }
         }
 
+        static void SetElementSqlType(XElement element)
+        {
+            var attribute = element.Attribute("sql-type");
+
+            if (attribute == null || attribute.Value.Contains("char") || attribute.Value.Contains("text"))
+                return;
+
+            logger.Debug("Updating sql-type to 'varchar'");
+            attribute.Value = "varchar";
+        }
+
+        static void SetElementLength(XElement element)
+        {
+            var attribute = element.Attribute("length");
+
+            if (attribute == null)
+                return;
+
+            var value = string.IsNullOrEmpty(attribute.Value) ? 0 : int.Parse(attribute.Value);
+
+            if (value < 255)
+            {
+                logger.Debug("Updating length to '255'");
+                attribute.Value = "255";
+            }
+        }
     }
 }
