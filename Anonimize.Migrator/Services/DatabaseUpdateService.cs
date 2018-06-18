@@ -54,8 +54,6 @@ namespace Anonimize.Migrator.Services
                 return true;
             }
 
-            logger.Info("Updating table `{0}` with total count of {1}", table.NameSnakeCase, items.Count());
-
             var modelItem = items.First();
             if (!modelItem.ContainsKey(table.PrimaryKey))
             {
@@ -71,6 +69,28 @@ namespace Anonimize.Migrator.Services
                     return false;
                 }
             }
+
+            var schemas = dbContext.GetTableSchema(table.NameSnakeCase).Where(q => q.RequiresUpdate());
+
+            var columnsToAlter = new List<string>();
+
+            foreach (var column in table.Columns)
+            {
+                if (schemas.Where(q => q.ColumnName == column.Name).Any())
+                {
+                    columnsToAlter.Add(column.Name);
+                }
+            }
+
+            if (columnsToAlter.Any())
+            {
+                logger.Info($"Altering table `{table.NameSnakeCase}`");
+                columnsToAlter.ForEach(column => logger.Info($"Altering column `{table.NameSnakeCase}`.`{column}`"));
+                dbContext.AlterTable(table.NameSnakeCase, columnsToAlter);
+            }
+
+
+            logger.Info("Updating table `{0}` with total count of {1}", table.NameSnakeCase, items.Count());
 
             var anonimize = AnonimizeProvider.GetInstance();
             var cryptoService = anonimize.GetCryptoService();

@@ -25,6 +25,10 @@
           "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
         },
         {
+          "Name": "CommercialName",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
           "Name": "Company",
           "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
         },

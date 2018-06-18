@@ -35,7 +35,8 @@ namespace Anonimize.Migrator.Database
         {
             logger.Debug("Updating table '{0}'", table);
 
-            var querySegments = new List<string> {
+            var querySegments = new List<string>
+            {
                 $"UPDATE `{table}`"
             };
 
@@ -47,7 +48,7 @@ namespace Anonimize.Migrator.Database
             }
 
             querySegments.Add($"SET {string.Join(", ", setSegments)}");
-            querySegments.Add($"WHERE `{primaryKey.Item1}` = {primaryKey.Item2}");
+            querySegments.Add($"WHERE `{primaryKey.Item1}` = {primaryKey.Item2};");
 
             var query = string.Join(" ", querySegments);
 
@@ -59,6 +60,48 @@ namespace Anonimize.Migrator.Database
                 db.Execute(query);
             }
         }
+
+        public void AlterTable(string table, IEnumerable<string> columns)
+        {
+            logger.Debug("Altering table '{0}'", table);
+
+            var querySegments = new List<string>
+            {
+                $"ALTER TABLE `{table}`"
+            };
+
+            var alterSegments = new List<string>();
+            foreach (var column in columns)
+            {
+                alterSegments.Add($"MODIFY COLUMN `{column}` varchar(255)");
+            }
+
+            querySegments.Add(string.Join(", ", alterSegments));
+
+            var query = string.Join(" ", querySegments) + ";";
+
+            logger.Debug(query);
+
+            using (var transaction = DbManager.BeginTransaction())
+            {
+                var db = transaction.Connection;
+                db.Execute(query);
+            }
+        }
+
+        public IEnumerable<Schema> GetTableSchema(string table)
+        {
+            logger.Debug("Getting schema from table '{0}'", table);
+
+            using (var transaction = DbManager.BeginTransaction())
+            {
+                var db = transaction.Connection;
+                var query = string.Format(QUERY_TABLE_SCHEMA, db.Database, table);
+                logger.Debug(query);
+                return db.Query<Schema>(query);
+            }
+        }
+
 
         public void Dispose()
         {
@@ -73,5 +116,32 @@ namespace Anonimize.Migrator.Database
                 DbManager?.Dispose();
             }
         }
+
+        public class Schema
+        {
+            public string ColumnName { get; set; }
+            public string DataType { get; set; }
+            public double? Length { get; set; }
+
+            public bool RequiresUpdate()
+            {
+                if (DataType.Contains("text"))
+                    return false;
+
+                if(!DataType.Contains("char"))
+                    return true;
+
+                if (!Length.HasValue || Length.Value < 255)
+                    return true;
+
+                return false;
+            }
+        }
+
+        #region Queries
+        public const string QUERY_TABLE_SCHEMA = @"
+SELECT COLUMN_NAME AS 'ColumnName', DATA_TYPE AS 'DataType', CHARACTER_MAXIMUM_LENGTH AS 'Length'
+FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}';";
+        #endregion
     }
 }
