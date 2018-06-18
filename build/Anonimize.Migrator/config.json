@@ -1,0 +1,82 @@
+﻿{
+  "Tables": [
+    {
+      "Name": "User",
+      "PrimaryKey": "IdUser",
+      "Columns": [
+        {
+          "Name": "AddressDistrict",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "AddressLine1",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "AddressLine2",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "AddressLocation",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "AddressPostcode",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "CommercialName",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "Company",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "Description",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "Email",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "FacebookUrl",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "FiscalIdNumber",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "LastIP",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "LinkedInUrl",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "Name",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "PhoneDefault",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "PhoneOptional",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "TwitterUrl",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        },
+        {
+          "Name": "Username",
+          "Converter": "Anonimize.DataAccess.EncryptedString, Anonimize.DataAccess, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null"
+        }
+      ]
+    }
+  ]
+}

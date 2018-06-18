@@ -1,0 +1,1 @@
+start "Anonimize - Migrator" "bin\Anonimize.Migrator.exe"
