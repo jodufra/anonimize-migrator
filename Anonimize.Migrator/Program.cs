@@ -6,6 +6,7 @@ using NLog;
 using System.Runtime.InteropServices;
 using Anonimize.Migrator.Services;
 using System.Globalization;
+using Anonimize.Services;
 
 namespace Anonimize.Migrator
 {
@@ -34,6 +35,7 @@ namespace Anonimize.Migrator
                 DisposeAndExit();
 
             // Update converters
+            Console.WriteLine();
             logger.Info("Updating converters");
 
             if (!CanProceed())
@@ -50,9 +52,36 @@ namespace Anonimize.Migrator
                 logger.Warn("Check log file for debug info");
                 DisposeAndExit();
             }
-            
+
             // Update database
+            Console.WriteLine();
             logger.Info("Updating database");
+
+            var iCryptoService = AnonimizeProvider.GetInstance().GetCryptoService();
+
+            logger.Warn($"Using service {iCryptoService.GetType().Name}");
+
+            if(iCryptoService is BaseSymmetricCryptoService cryptoService)
+            {
+                if (string.IsNullOrWhiteSpace(xAppConfig.Iv))
+                {
+                    logger.Warn("Using default Anonimize:Iv");
+                }
+                else
+                {
+                    logger.Warn($"Using Anonimize:Iv '{xAppConfig.Iv}'");
+                }
+
+                if (string.IsNullOrWhiteSpace(xAppConfig.Key))
+                {
+                    logger.Warn("Using default Anonimize:Key");
+                }
+                else
+                {
+                    logger.Warn($"Using Anonimize:Key '{xAppConfig.Key}'");
+                }
+            }
+
             logger.Warn("Connection: {0}", xAppConfig.ConnectionString);
 
             if (!CanProceed())
@@ -96,7 +125,7 @@ namespace Anonimize.Migrator
             return true;
         }
 
-        static void DisposeAndExit(int? exitCode = null, bool pressKey = true)
+        static void DisposeAndExit(int? exitCode = null, bool exit = true)
         {
             NullSafeDispose(jConfig);
             NullSafeDispose(xAppConfig);
@@ -109,13 +138,12 @@ namespace Anonimize.Migrator
 
             LogManager.Flush();
 
-            if (pressKey)
+            if (exit)
             {
-                Console.WriteLine("Press any key to exit.");
+                Console.WriteLine("Press any key to exit ...");
                 Console.ReadKey();
+                Environment.Exit(exitCode ?? 0);
             }
-
-            Environment.Exit(exitCode ?? 0);
         }
 
         static void NullSafeDispose(IDisposable disposable)
@@ -126,7 +154,7 @@ namespace Anonimize.Migrator
 
         static bool CanProceed()
         {
-            Console.WriteLine("Proceed? Y/n");
+            Console.Write("Proceed? (Y/n) ");
 
             bool? proceed = null;
 
