@@ -49,19 +49,19 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>7gp7vnGZWzxMThykpL7a5vZD855l6MYtBf6BXCcExM8=</dsig:DigestValue>
+        <dsig:DigestValue>CWLJ1GmXK0wBj0+tEpuBbgY9YiAMPD2yKcp6tm3hGqY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Anonimize.Migrator.exe" size="29656">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Anonimize.Migrator.exe" size="29144">
       <assemblyIdentity name="Anonimize.Migrator" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>MJYi2tw+7hOdXdGbsrOnQwIpbLY2545d3oCbtzhLnbY=</dsig:DigestValue>
+        <dsig:DigestValue>SSG+aTMIWgBP/pqvbG/SnJ7kyL/gvR8B+sJGQBb4Pm8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
