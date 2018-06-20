@@ -22,11 +22,10 @@ namespace Anonimize.Migrator.IO
 
             var query = $"SELECT * FROM `{table}`";
 
-            logger.Debug(query);
-
             using (var transaction = DbManager.BeginTransaction())
             {
                 var db = transaction.Connection;
+                logger.Debug(query);
                 return db.Query(query);
             }
         }
@@ -52,11 +51,10 @@ namespace Anonimize.Migrator.IO
 
             var query = string.Join(" ", querySegments);
 
-            logger.Debug(query);
-
             using (var transaction = DbManager.BeginTransaction())
             {
                 var db = transaction.Connection;
+                logger.Debug(query);
                 db.Execute(query);
             }
         }
@@ -80,11 +78,10 @@ namespace Anonimize.Migrator.IO
 
             var query = string.Join(" ", querySegments) + ";";
 
-            logger.Debug(query);
-
             using (var transaction = DbManager.BeginTransaction())
             {
                 var db = transaction.Connection;
+                logger.Debug(query);
                 db.Execute(query);
             }
         }
@@ -93,10 +90,19 @@ namespace Anonimize.Migrator.IO
         {
             logger.Debug("Getting schema from table '{0}'", table);
 
+            var querySegments = new List<string>
+            {
+                "SELECT COLUMN_NAME AS 'ColumnName', DATA_TYPE AS 'DataType', CHARACTER_MAXIMUM_LENGTH AS 'Length'",
+                "FROM INFORMATION_SCHEMA.COLUMNS",
+                "WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}';"
+            };
+
+            var query = string.Join(" ", querySegments);
+
             using (var transaction = DbManager.BeginTransaction())
             {
                 var db = transaction.Connection;
-                var query = string.Format(QUERY_TABLE_SCHEMA, db.Database, table);
+                query = string.Format(query, db.Database, table);
                 logger.Debug(query);
                 return db.Query<Schema>(query);
             }
@@ -109,7 +115,7 @@ namespace Anonimize.Migrator.IO
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -128,7 +134,7 @@ namespace Anonimize.Migrator.IO
                 if (DataType.Contains("text"))
                     return false;
 
-                if(!DataType.Contains("char"))
+                if (!DataType.Contains("char"))
                     return true;
 
                 if (!Length.HasValue || Length.Value < 255)
@@ -137,11 +143,5 @@ namespace Anonimize.Migrator.IO
                 return false;
             }
         }
-
-        #region Queries
-        public const string QUERY_TABLE_SCHEMA = @"
-SELECT COLUMN_NAME AS 'ColumnName', DATA_TYPE AS 'DataType', CHARACTER_MAXIMUM_LENGTH AS 'Length'
-FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}';";
-        #endregion
     }
 }
