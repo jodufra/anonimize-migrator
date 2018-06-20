@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace Anonimize.Migrator.JSON
+namespace Anonimize.Migrator.IO
 {
     public class JReader<T> : IDisposable where T : class
     {

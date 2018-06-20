@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using System.IO;
 
-namespace Anonimize.Migrator.XML
+namespace Anonimize.Migrator.IO
 {
     public class XContext : IDisposable
     {

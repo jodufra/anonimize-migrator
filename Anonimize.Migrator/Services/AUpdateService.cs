@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Anonimize.Migrator.JSON;
+using Anonimize.Migrator.IO;
 using Anonimize.Migrator.Models;
 using NLog;
 

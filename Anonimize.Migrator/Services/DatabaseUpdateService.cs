@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Anonimize.Migrator.Database;
-using Anonimize.Migrator.JSON;
+using Anonimize.Migrator.IO;
 using Anonimize.Migrator.Models;
-using Anonimize.Migrator.XML;
 using NLog;
 
 namespace Anonimize.Migrator.Services
@@ -13,10 +11,10 @@ namespace Anonimize.Migrator.Services
     {
         static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
-        protected XAppConfig xAppConfig;
+        protected XConfig xAppConfig;
         DbContext dbContext;
 
-        public DatabaseUpdateService(JConfig jConfig, XAppConfig xAppConfig) : base(jConfig)
+        public DatabaseUpdateService(JConfig jConfig, XConfig xAppConfig) : base(jConfig)
         {
             this.xAppConfig = xAppConfig;
         }

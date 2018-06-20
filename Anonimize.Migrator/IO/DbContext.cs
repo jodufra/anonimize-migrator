@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Dapper;
 using NLog;
 
-namespace Anonimize.Migrator.Database
+namespace Anonimize.Migrator.IO
 {
     public class DbContext : IDisposable
     {

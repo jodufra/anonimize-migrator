@@ -3,7 +3,7 @@ using System.Data;
 using System;
 using NLog;
 
-namespace Anonimize.Migrator.Database
+namespace Anonimize.Migrator.IO
 {
     public class DbManager : IDisposable
     {

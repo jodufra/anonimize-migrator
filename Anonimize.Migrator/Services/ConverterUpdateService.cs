@@ -1,5 +1,4 @@
-﻿using Anonimize.Migrator.XML;
-using Anonimize.Migrator.JSON;
+﻿using Anonimize.Migrator.IO;
 using Anonimize.Migrator.Models;
 
 namespace Anonimize.Migrator.Services

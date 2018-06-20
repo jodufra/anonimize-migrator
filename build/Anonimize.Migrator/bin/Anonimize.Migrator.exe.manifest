@@ -42,26 +42,26 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Anonimize.dll" size="7168">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Anonimize.dll" size="8192">
       <assemblyIdentity name="Anonimize" version="0.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>qV9UeHVHh/jNneYChBUarh0lWz7uvfDIb4DIbKj5ZWI=</dsig:DigestValue>
+        <dsig:DigestValue>7gp7vnGZWzxMThykpL7a5vZD855l6MYtBf6BXCcExM8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Anonimize.Migrator.exe" size="27608">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Anonimize.Migrator.exe" size="29656">
       <assemblyIdentity name="Anonimize.Migrator" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>QWyUabcxqmn9zoUcCrQUxhtlHhC5pZBUGcpM7aECers=</dsig:DigestValue>
+        <dsig:DigestValue>MJYi2tw+7hOdXdGbsrOnQwIpbLY2545d3oCbtzhLnbY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

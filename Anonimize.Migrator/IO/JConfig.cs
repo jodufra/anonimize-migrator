@@ -3,7 +3,7 @@ using System.Configuration;
 using Anonimize.Migrator.Models;
 using Newtonsoft.Json;
 
-namespace Anonimize.Migrator.JSON
+namespace Anonimize.Migrator.IO
 {
     public class JConfig : JReader<JConfig.Config>
     {

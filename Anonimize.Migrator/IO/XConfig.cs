@@ -4,9 +4,9 @@ using System.Linq;
 using System.Xml.Linq;
 using Anonimize.Services;
 
-namespace Anonimize.Migrator.XML
+namespace Anonimize.Migrator.IO
 {
-    public class XAppConfig : XContext
+    public class XConfig : XContext
     {
         readonly string CONNECTION_NAME = ConfigurationManager.AppSettings["AppConfig:Connection"];
         readonly string CONNECTION_STRING_POSFIX = ConfigurationManager.AppSettings["AppConfig:ConnectionStringPosfix"];
@@ -20,7 +20,7 @@ namespace Anonimize.Migrator.XML
         string key;
         public string Key => key;
 
-        public XAppConfig() : base(ConfigurationManager.AppSettings["Uri:AppConfig"])
+        public XConfig() : base(ConfigurationManager.AppSettings["Uri:AppConfig"])
         {
 
         }

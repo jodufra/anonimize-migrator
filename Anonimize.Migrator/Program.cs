@@ -1,6 +1,4 @@
-﻿using System.IO;
-using Anonimize.Migrator.JSON;
-using Anonimize.Migrator.XML;
+﻿using Anonimize.Migrator.IO;
 using System;
 using NLog;
 using System.Runtime.InteropServices;
@@ -15,7 +13,7 @@ namespace Anonimize.Migrator
         static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         static JConfig jConfig;
-        static XAppConfig xAppConfig;
+        static XConfig xConfig;
         static XEntities xEntities;
 
         static void Main()
@@ -38,20 +36,7 @@ namespace Anonimize.Migrator
             Console.WriteLine();
             logger.Info("Updating converters");
 
-            if (!CanProceed())
-                DisposeAndExit();
-
-            var converterService = new ConverterUpdateService(jConfig, xEntities);
-            if (converterService.Update())
-            {
-                logger.Info("Updated with success");
-            }
-            else
-            {
-                logger.Fatal("One or more errors occurred while updating");
-                logger.Warn("Check log file for debug info");
-                DisposeAndExit();
-            }
+            RunUpdateService(new ConverterUpdateService(jConfig, xEntities));
 
             // Update database
             Console.WriteLine();
@@ -59,45 +44,32 @@ namespace Anonimize.Migrator
 
             var iCryptoService = AnonimizeProvider.GetInstance().GetCryptoService();
 
-            logger.Warn($"Using service {iCryptoService.GetType().Name}");
+            logger.Warn($"CryptoService: {iCryptoService.GetType().Name}");
 
             if(iCryptoService is BaseSymmetricCryptoService cryptoService)
             {
-                if (string.IsNullOrWhiteSpace(xAppConfig.Iv))
+                if (string.IsNullOrWhiteSpace(xConfig.Iv))
                 {
                     logger.Warn("Using default Anonimize:Iv");
                 }
                 else
                 {
-                    logger.Warn($"Using Anonimize:Iv '{xAppConfig.Iv}'");
+                    logger.Warn($"Anonimize:Iv: '{xConfig.Iv}'");
                 }
 
-                if (string.IsNullOrWhiteSpace(xAppConfig.Key))
+                if (string.IsNullOrWhiteSpace(xConfig.Key))
                 {
                     logger.Warn("Using default Anonimize:Key");
                 }
                 else
                 {
-                    logger.Warn($"Using Anonimize:Key '{xAppConfig.Key}'");
+                    logger.Warn($"Anonimize:Key: '{xConfig.Key}'");
                 }
             }
 
-            logger.Warn("Connection: {0}", xAppConfig.ConnectionString);
-
-            if (!CanProceed())
-                DisposeAndExit();
-
-            var databaseService = new DatabaseUpdateService(jConfig, xAppConfig);
-            if (databaseService.Update())
-            {
-                logger.Info("Updated with success");
-            }
-            else
-            {
-                logger.Fatal("One or more errors occurred while updating");
-                logger.Warn("Check log file for debug info");
-                DisposeAndExit();
-            }
+            logger.Warn("Connection: {0}", xConfig.ConnectionString);
+            
+            RunUpdateService(new DatabaseUpdateService(jConfig, xConfig));
 
             DisposeAndExit();
         }
@@ -109,8 +81,8 @@ namespace Anonimize.Migrator
                 jConfig = new JConfig();
                 jConfig.ReadJsonDocument();
 
-                xAppConfig = new XAppConfig();
-                xAppConfig.ReadXmlDocument();
+                xConfig = new XConfig();
+                xConfig.ReadXmlDocument();
 
                 xEntities = new XEntities();
                 xEntities.ReadXmlDocument();
@@ -125,10 +97,28 @@ namespace Anonimize.Migrator
             return true;
         }
 
+        static void RunUpdateService(AUpdateService service)
+        {
+            if (!CanProceed())
+                DisposeAndExit();
+
+            var success = service.Update();
+            if (success)
+            {
+                logger.Info("Updated with success");
+            }
+            else
+            {
+                logger.Fatal("One or more errors occurred while updating");
+                logger.Warn("Check log file for debug info");
+                DisposeAndExit();
+            }
+        }
+
         static void DisposeAndExit(int? exitCode = null, bool exit = true)
         {
             NullSafeDispose(jConfig);
-            NullSafeDispose(xAppConfig);
+            NullSafeDispose(xConfig);
             NullSafeDispose(xEntities);
 
             if (exitCode.HasValue)
@@ -140,8 +130,9 @@ namespace Anonimize.Migrator
 
             if (exit)
             {
-                Console.WriteLine("Press any key to exit ...");
+                Console.Write("Press any key to exit . . . ");
                 Console.ReadKey();
+                Console.WriteLine();
                 Environment.Exit(exitCode ?? 0);
             }
         }

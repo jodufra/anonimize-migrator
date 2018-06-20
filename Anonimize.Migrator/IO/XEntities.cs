@@ -3,7 +3,7 @@ using System.Linq;
 using System.Xml.Linq;
 using NLog;
 
-namespace Anonimize.Migrator.XML
+namespace Anonimize.Migrator.IO
 {
     public class XEntities : XContext
     {

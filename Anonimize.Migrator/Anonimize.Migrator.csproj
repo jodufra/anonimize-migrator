@@ -97,12 +97,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Database\DbManager.cs" />
-    <Compile Include="Database\DbContext.cs" />
+    <Compile Include="IO\DbManager.cs" />
+    <Compile Include="IO\DbContext.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
-    <Compile Include="JSON\JConfig.cs" />
-    <Compile Include="JSON\JContext.cs" />
+    <Compile Include="IO\JConfig.cs" />
+    <Compile Include="IO\JContext.cs" />
     <Compile Include="Services\AUpdateService.cs" />
     <Compile Include="Models\TableColumn.cs" />
     <Compile Include="Models\Table.cs" />
@@ -110,9 +110,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ConverterUpdateService.cs" />
     <Compile Include="Services\DatabaseUpdateService.cs" />
-    <Compile Include="XML\XEntities.cs" />
-    <Compile Include="XML\XContext.cs" />
-    <Compile Include="XML\XAppConfig.cs" />
+    <Compile Include="IO\XEntities.cs" />
+    <Compile Include="IO\XContext.cs" />
+    <Compile Include="IO\XConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
