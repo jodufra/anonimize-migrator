@@ -18,9 +18,9 @@ namespace Anonimize.Migrator
 
         static void Main()
         {
-            logger.Info("|-----------------------------------------|");
-            logger.Info("|-------------- Anonimizer ---------------|");
-            logger.Info("|-----------------------------------------|");
+            logger.Info("-----------------------------------------");
+            logger.Info("-------------- Anonimizer ---------------");
+            logger.Info("-----------------------------------------");
 
             SetConsoleCtrlHandler(new ConsoleCtrlHandler(OnConsoleEvent), true);
 
