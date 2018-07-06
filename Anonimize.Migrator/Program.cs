@@ -5,11 +5,14 @@ using System.Runtime.InteropServices;
 using Anonimize.Migrator.Services;
 using System.Globalization;
 using Anonimize.Services;
+using System.Collections.Generic;
 
 namespace Anonimize.Migrator
 {
     class Program
     {
+        delegate void MigratorTask();
+
         static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         static JConfig jConfig;
@@ -32,44 +35,10 @@ namespace Anonimize.Migrator
             if (!LoadResources())
                 DisposeAndExit();
 
-            // Update converters
-            Console.WriteLine();
-            logger.Info("Updating converters");
-
-            RunUpdateService(new ConverterUpdateService(jConfig, xEntities));
-
-            // Update database
-            Console.WriteLine();
-            logger.Info("Updating database");
-
-            var iCryptoService = AnonimizeProvider.GetInstance().GetCryptoService();
-
-            logger.Warn($"CryptoService: {iCryptoService.GetType().Name}");
-
-            if(iCryptoService is BaseSymmetricCryptoService cryptoService)
+            while (ChooseTask(out MigratorTask task))
             {
-                if (string.IsNullOrWhiteSpace(xConfig.Iv))
-                {
-                    logger.Warn("Using default Anonimize:Iv");
-                }
-                else
-                {
-                    logger.Warn($"Anonimize:Iv: '{xConfig.Iv}'");
-                }
-
-                if (string.IsNullOrWhiteSpace(xConfig.Key))
-                {
-                    logger.Warn("Using default Anonimize:Key");
-                }
-                else
-                {
-                    logger.Warn($"Anonimize:Key: '{xConfig.Key}'");
-                }
+                task();
             }
-
-            logger.Warn("Connection: {0}", xConfig.ConnectionString);
-            
-            RunUpdateService(new DatabaseUpdateService(jConfig, xConfig));
 
             DisposeAndExit();
         }
@@ -97,10 +66,55 @@ namespace Anonimize.Migrator
             return true;
         }
 
+        static void UpdateConverter()
+        {
+            // Update converters
+            Console.WriteLine();
+            logger.Info("Updating converters");
+
+            RunUpdateService(new ConverterUpdateService(jConfig, xEntities));
+        }
+
+        static void UpdateDatabase()
+        {
+            // Update database
+            Console.WriteLine();
+            logger.Info("Updating database");
+
+            var iCryptoService = AnonimizeProvider.GetInstance().GetCryptoService();
+
+            logger.Warn($"CryptoService: {iCryptoService.GetType().Name}");
+
+            if (iCryptoService is BaseSymmetricCryptoService cryptoService)
+            {
+                if (string.IsNullOrWhiteSpace(xConfig.Iv))
+                {
+                    logger.Warn("Using default Anonimize:Iv");
+                }
+                else
+                {
+                    logger.Warn($"Anonimize:Iv: '{xConfig.Iv}'");
+                }
+
+                if (string.IsNullOrWhiteSpace(xConfig.Key))
+                {
+                    logger.Warn("Using default Anonimize:Key");
+                }
+                else
+                {
+                    logger.Warn($"Anonimize:Key: '{xConfig.Key}'");
+                }
+            }
+
+            logger.Warn("Connection: {0}", xConfig.ConnectionString);
+
+            RunUpdateService(new DatabaseUpdateService(jConfig, xConfig));
+        }
+
         static void RunUpdateService(AUpdateService service)
         {
             if (!CanProceed())
-                DisposeAndExit();
+                return;
 
             var success = service.Update();
             if (success)
@@ -111,36 +125,45 @@ namespace Anonimize.Migrator
             {
                 logger.Fatal("One or more errors occurred while updating");
                 logger.Warn("Check log file for debug info");
-                DisposeAndExit();
             }
         }
 
-        static void DisposeAndExit(int? exitCode = null, bool exit = true)
+        #region Utilities
+        static bool ChooseTask(out MigratorTask task)
         {
-            NullSafeDispose(jConfig);
-            NullSafeDispose(xConfig);
-            NullSafeDispose(xEntities);
-
-            if (exitCode.HasValue)
-                logger.Warn($"Application terminated ({0}).", exitCode.Value);
-            else
-                logger.Debug($"Application terminated.");
-
-            LogManager.Flush();
-
-            if (exit)
+            var tasks = new Dictionary<char, MigratorTask>
             {
-                Console.Write("Press any key to exit . . . ");
-                Console.ReadKey();
-                Console.WriteLine();
-                Environment.Exit(exitCode ?? 0);
-            }
-        }
+                { '1', UpdateConverter },
+                { '2', UpdateDatabase }
+            };
 
-        static void NullSafeDispose(IDisposable disposable)
-        {
-            if (disposable != null)
-                disposable.Dispose();
+            Console.WriteLine("");
+            Console.WriteLine("Select one of the following task numbers:");
+            foreach (var item in tasks)
+            {
+                Console.WriteLine($"{item.Key} - {item.Value.Method.Name}");
+            }
+            Console.WriteLine("0 - Exit");
+
+            task = null;
+            do
+            {
+                var key = Console.ReadKey().KeyChar;
+
+                if (key == '0')
+                    break;
+
+                if (tasks.ContainsKey(key))
+                    task = tasks[key];
+
+                if (task == null)
+                    Console.WriteLine("Invalid task");
+
+            } while (task == null);
+
+            Console.WriteLine();
+
+            return task != null;
         }
 
         static bool CanProceed()
@@ -174,6 +197,35 @@ namespace Anonimize.Migrator
 
             return proceed.Value;
         }
+
+        static void DisposeAndExit(int? exitCode = null, bool exit = true)
+        {
+            NullSafeDispose(jConfig);
+            NullSafeDispose(xConfig);
+            NullSafeDispose(xEntities);
+
+            if (exitCode.HasValue)
+                logger.Warn($"Application terminated ({0}).", exitCode.Value);
+            else
+                logger.Debug($"Application terminated.");
+
+            LogManager.Flush();
+
+            if (exit)
+            {
+                Console.Write("Press any key to exit . . . ");
+                Console.ReadKey();
+                Console.WriteLine();
+                Environment.Exit(exitCode ?? 0);
+            }
+        }
+
+        static void NullSafeDispose(IDisposable disposable)
+        {
+            if (disposable != null)
+                disposable.Dispose();
+        }
+        #endregion
 
         #region ConsoleCtrlHandler
         delegate bool ConsoleCtrlHandler(int eventType);
